@@ -143,7 +143,7 @@ Then try `.\venv\Scripts\Activate.ps1` again.
 - Close and reopen PowerShell after installing.
 
 **"psycopg2-binary" fails to install**
-- You don't need it for local use (it's for PostgreSQL). It should not be in requirements.txt. If it appears, remove that line.
+- It's required for connecting to PostgreSQL in production (e.g. Railway). If it fails to build locally, make sure you're on Python 3.11 or 3.12 (see the Python version note above) — the prebuilt wheels for `psycopg2-binary` don't always keep up with the newest Python version.
 
 **"passlib" / bcrypt error on register**
 - The app uses `bcrypt` directly, not passlib. If you see a passlib error, run:
