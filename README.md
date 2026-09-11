@@ -27,12 +27,19 @@ A grade tracker for college students. Add courses with syllabus weights, track e
 
 ## First-Time Setup (do this once)
 
+### 0. Get the code
+
+```powershell
+git clone https://github.com/Satyansh-alt/myAssignments.git
+cd myAssignments
+```
+
 ### 1. Backend setup
 
 Open PowerShell and run each command one at a time:
 
 ```powershell
-cd "C:\Users\satys\OneDrive\Documents\Guru\Claude Agents\First Agent\output\myAssignments\backend"
+cd path\to\myAssignments\backend
 ```
 
 Allow scripts to run (required on Windows, one-time only):
@@ -80,7 +87,7 @@ You should see: `Uvicorn running on http://127.0.0.1:8000` — leave this window
 Open a **second** PowerShell window:
 
 ```powershell
-cd "C:\Users\satys\OneDrive\Documents\Guru\Claude Agents\First Agent\output\myAssignments\frontend"
+cd path\to\myAssignments\frontend
 npm install
 npm run dev
 ```
@@ -97,14 +104,14 @@ You only need two commands each time. Open two PowerShell windows:
 
 **Window 1 — Backend:**
 ```powershell
-cd "C:\Users\satys\OneDrive\Documents\Guru\Claude Agents\First Agent\output\myAssignments\backend"
+cd path\to\myAssignments\backend
 .\venv\Scripts\Activate.ps1
 uvicorn app.main:app --reload
 ```
 
 **Window 2 — Frontend:**
 ```powershell
-cd "C:\Users\satys\OneDrive\Documents\Guru\Claude Agents\First Agent\output\myAssignments\frontend"
+cd path\to\myAssignments\frontend
 npm run dev
 ```
 
@@ -112,9 +119,9 @@ Then go to **http://localhost:5173**.
 
 ---
 
-## Sharing With Someone Else
+## Running It Yourself
 
-Zip the entire `myAssignments` folder (make sure `.env` is included — it starts with a dot so may be hidden) and send it. They follow the same First-Time Setup steps above. Their data is stored locally on their own machine and is completely separate from yours.
+Anyone can clone this repo and run their own local copy — see First-Time Setup above. You'll need your own Anthropic API key for the AI features (each person's `.env` is private and never committed to git). Each person's data is stored locally on their own machine and is completely separate from everyone else's.
 
 ---
 
