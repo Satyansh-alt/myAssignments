@@ -15,7 +15,8 @@ export default function Register() {
     setError('')
     setLoading(true)
     try {
-      const res = await register(form)
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+      const res = await register({ ...form, timezone })
       const token = res.data.access_token
       localStorage.setItem('token', token)
       const me = await getMe()

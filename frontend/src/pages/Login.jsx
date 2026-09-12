@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { login, getMe } from '../api/auth'
+import { login, getMe, updateMe } from '../api/auth'
 import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
@@ -19,7 +19,11 @@ export default function Login() {
       const res = await login(email, password)
       const token = res.data.access_token
       localStorage.setItem('token', token)
-      const me = await getMe()
+      let me = await getMe()
+      const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone
+      if (browserTimezone && me.data.timezone !== browserTimezone) {
+        me = await updateMe({ timezone: browserTimezone })
+      }
       loginWithToken(token, me.data)
       navigate('/')
     } catch {
