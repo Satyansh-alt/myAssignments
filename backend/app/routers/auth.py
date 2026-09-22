@@ -14,12 +14,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 def register(body: UserCreate, db: Session = Depends(get_db)):
     if db.query(User).filter(User.email == body.email).first():
         raise HTTPException(status_code=400, detail="Email already registered")
-    user = User(
-        email=body.email,
-        hashed_password=hash_password(body.password),
-        full_name=body.full_name,
-        timezone=body.timezone,
-    )
+    user = User(email=body.email, hashed_password=hash_password(body.password), full_name=body.full_name)
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -41,12 +36,7 @@ def me(current_user: User = Depends(get_current_user)):
 
 @router.put("/me", response_model=UserOut)
 def update_me(body: UserUpdate, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    if body.full_name is not None:
-        current_user.full_name = body.full_name
-    if body.timezone is not None:
-        current_user.timezone = body.timezone
-    if body.daily_digest_enabled is not None:
-        current_user.daily_digest_enabled = body.daily_digest_enabled
+    current_user.full_name = body.full_name
     db.commit()
     db.refresh(current_user)
     return current_user

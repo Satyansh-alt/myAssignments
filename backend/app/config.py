@@ -9,8 +9,6 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
     ANTHROPIC_API_KEY: str = ""
     ALLOWED_ORIGINS: str = "http://localhost:5173"
-    RESEND_API_KEY: str = ""
-    DIGEST_FROM_EMAIL: str = "myAssignments <onboarding@resend.dev>"
 
     @property
     def is_sqlite(self) -> bool:

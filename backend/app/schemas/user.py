@@ -6,21 +6,16 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
     full_name: str
-    timezone: str = "UTC"
 
 
 class UserUpdate(BaseModel):
-    full_name: str | None = None
-    timezone: str | None = None
-    daily_digest_enabled: bool | None = None
+    full_name: str
 
 
 class UserOut(BaseModel):
     id: int
     email: str
     full_name: str
-    timezone: str
-    daily_digest_enabled: bool
     created_at: datetime
 
     class Config:
