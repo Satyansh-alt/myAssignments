@@ -5,3 +5,5 @@ export const getAssignmentsByCategory = (categoryId) => client.get(`/categories/
 export const createAssignment = (data) => client.post('/assignments', data)
 export const updateAssignment = (id, data) => client.put(`/assignments/${id}`, data)
 export const deleteAssignment = (id) => client.delete(`/assignments/${id}`)
+export const setAssignmentCompletion = (id, occurrenceDate, completed) =>
+  client.put(`/assignments/${id}/complete`, { occurrence_date: occurrenceDate, completed })

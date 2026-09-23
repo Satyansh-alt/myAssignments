@@ -5,6 +5,7 @@ import { updateMe } from '../../api/auth'
 
 const NAV_LINKS = [
   { to: '/', label: 'Dashboard' },
+  { to: '/calendar', label: 'Calendar' },
   { to: '/courses', label: 'Courses' },
   { to: '/chat', label: 'AI Assistant' },
 ]

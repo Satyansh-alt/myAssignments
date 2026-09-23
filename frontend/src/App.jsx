@@ -3,6 +3,7 @@ import { useAuth } from './context/AuthContext'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
+import Calendar from './pages/Calendar'
 import Courses from './pages/Courses'
 import CourseDetail from './pages/CourseDetail'
 import GradeCalculator from './pages/GradeCalculator'
@@ -36,6 +37,7 @@ export default function App() {
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
           <Route path="/" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
           <Route path="/courses" element={<ProtectedRoute><Courses /></ProtectedRoute>} />
           <Route path="/courses/:id" element={<ProtectedRoute><CourseDetail /></ProtectedRoute>} />
           <Route path="/courses/:id/grades" element={<ProtectedRoute><GradeCalculator /></ProtectedRoute>} />

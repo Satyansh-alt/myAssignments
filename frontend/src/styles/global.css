@@ -306,8 +306,19 @@ label {
   gap: 0.5rem;
 }
 .assignment-item.graded { opacity: 0.7; }
+.assignment-item.completed .assignment-name { text-decoration: line-through; color: var(--text-muted); }
 .assignment-item-left { display: flex; align-items: center; gap: 0.75rem; }
 .assignment-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; }
+.assignment-checkbox { width: 18px; height: 18px; flex-shrink: 0; cursor: pointer; accent-color: var(--primary); }
+
+.range-select {
+  font-size: 0.85rem;
+  padding: 0.3rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+}
 
 .course-dot {
   width: 10px; height: 10px;
@@ -652,4 +663,59 @@ label {
   }
   .overall-grade-card { flex-direction: column; }
   .chat-bubble { max-width: 90%; }
+  .calendar-grid { gap: 2px; }
+  .calendar-cell { min-height: 44px; padding: 0.25rem; }
 }
+
+/* ===== Calendar ===== */
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+.calendar-controls h2 { font-size: 1.2rem; font-weight: 600; min-width: 180px; text-align: center; }
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 1.5rem;
+}
+.calendar-weekday {
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding-bottom: 0.25rem;
+}
+.calendar-cell {
+  min-height: 64px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  cursor: pointer;
+  font-family: inherit;
+}
+.calendar-cell.empty { background: transparent; border: none; cursor: default; }
+.calendar-cell.today { border-color: var(--primary); border-width: 2px; }
+.calendar-cell.selected { background: var(--primary-light); }
+.calendar-day-num { font-size: 0.85rem; font-weight: 600; }
+.calendar-count {
+  align-self: flex-end;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+}
+.calendar-count.all-done { background: #d1fae5; color: var(--success); }
+
+.calendar-detail { margin-top: 1.5rem; }

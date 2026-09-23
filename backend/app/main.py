@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
 from app.database import Base, engine
 from app import models  # noqa: F401 — ensures all models are registered before create_all
-from app.routers import auth, courses, categories, assignments, grades, dashboard, syllabus, ai
+from app.routers import auth, courses, categories, assignments, grades, dashboard, syllabus, ai, calendar
 
 settings = get_settings()
 
@@ -25,6 +25,7 @@ app.include_router(categories.router, prefix="/api")
 app.include_router(assignments.router, prefix="/api")
 app.include_router(grades.router, prefix="/api")
 app.include_router(dashboard.router, prefix="/api")
+app.include_router(calendar.router, prefix="/api")
 app.include_router(syllabus.router, prefix="/api")
 app.include_router(ai.router, prefix="/api")
 

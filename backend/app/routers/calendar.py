@@ -1,6 +1,7 @@
+import calendar as calendar_module
+from datetime import datetime
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
 from app.database import get_db
 from app.models.assignment import Assignment
 from app.models.course import Course
@@ -9,18 +10,19 @@ from app.models.completion import AssignmentCompletion
 from app.services.occurrence_service import occurrences_in_range
 from app.dependencies import get_current_user
 
-router = APIRouter(prefix="/dashboard", tags=["dashboard"])
+router = APIRouter(prefix="/calendar", tags=["calendar"])
 
 
 @router.get("")
-def dashboard(
-    days: int = Query(default=7, ge=1, le=90),
+def month_view(
+    year: int = Query(...),
+    month: int = Query(..., ge=1, le=12),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    now = datetime.now()
-    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    range_end = today_start + timedelta(days=days)
+    range_start = datetime(year, month, 1)
+    days_in_month = calendar_module.monthrange(year, month)[1]
+    range_end = datetime(year, month, days_in_month, 23, 59, 59)
 
     courses = {c.id: c for c in db.query(Course).filter(Course.user_id == current_user.id).all()}
     assignments = db.query(Assignment).filter(Assignment.course_id.in_(courses.keys())).all()
@@ -34,17 +36,15 @@ def dashboard(
         )
         completions = {(assignment_id, occurrence_date) for assignment_id, occurrence_date in rows}
 
-    today_items = []
-    upcoming_items = []
-
+    days: dict[str, list] = {}
     for a in assignments:
-        occurrences = occurrences_in_range(a, today_start, range_end)
+        occurrences = occurrences_in_range(a, range_start, range_end)
         if not occurrences:
             continue
-
         course = courses.get(a.course_id)
         for occ in occurrences:
-            item = {
+            key = occ.date().isoformat()
+            days.setdefault(key, []).append({
                 "assignment_id": a.id,
                 "name": a.name,
                 "due_date": occ.isoformat(),
@@ -56,12 +56,9 @@ def dashboard(
                 "is_graded": a.earned_score is not None,
                 "is_recurring": a.is_recurring,
                 "completed": (a.id, occ.date()) in completions,
-            }
-            if occ < today_start + timedelta(days=1):
-                today_items.append(item)
-            else:
-                upcoming_items.append(item)
+            })
 
-    today_items.sort(key=lambda x: x["due_date"])
-    upcoming_items.sort(key=lambda x: x["due_date"])
-    return {"today": today_items, "upcoming": upcoming_items}
+    for key in days:
+        days[key].sort(key=lambda x: x["due_date"])
+
+    return {"year": year, "month": month, "days": days}
