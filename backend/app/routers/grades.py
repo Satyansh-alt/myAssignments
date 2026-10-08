@@ -31,8 +31,12 @@ def grade_summary(current_user: User = Depends(get_current_user), db: Session = 
             "course_name": course.name,
             "semester": course.semester,
             "color": course.color,
+            "current_percent": grade["current_percent"],
+            "current_letter": grade["current_letter"],
+            "total_percent": grade["total_percent"],
+            "total_letter": grade["total_letter"],
+            "weight_graded_so_far": grade["weight_graded_so_far"],
             "overall_percent": grade["overall_percent"],
             "letter_grade": grade["letter_grade"],
-            "weight_graded_so_far": grade["weight_graded_so_far"],
         })
     return summary

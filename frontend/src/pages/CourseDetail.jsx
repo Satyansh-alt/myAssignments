@@ -12,6 +12,12 @@ const RECURRENCE_OPTIONS = [
   { value: 'monthly', label: 'Monthly' },
 ]
 
+const btnPrimary = 'rounded-lg bg-violet px-4 py-2 font-medium text-white transition hover:bg-violet-light disabled:opacity-60'
+const btnSecondary = 'rounded-lg border border-white/10 px-3 py-1.5 text-sm text-zinc-300 transition hover:border-violet/50 hover:text-white disabled:opacity-40'
+const inputCls = 'rounded-lg border border-white/10 bg-ink-700 px-3 py-2 text-zinc-100 focus:border-violet focus:outline-none'
+const labelCls = 'flex flex-col gap-1.5 text-sm text-zinc-300'
+const card = 'mb-4 flex flex-col gap-4 rounded-xl border border-white/5 bg-ink-800 p-5 shadow-glow'
+
 export default function CourseDetail() {
   const { id } = useParams()
   const [course, setCourse] = useState(null)
@@ -101,95 +107,95 @@ export default function CourseDetail() {
   const totalWeight = categories.reduce((s, c) => s + c.weight_percent, 0)
 
   return (
-    <div className="page">
-      <div className="page-header">
+    <div className="mx-auto max-w-4xl px-4 py-6">
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1>{course?.name}</h1>
-          {course?.semester && <span className="course-semester">{course.semester}</span>}
+          <h1 className="font-display text-2xl font-semibold tracking-tight">{course?.name}</h1>
+          {course?.semester && <span className="text-sm text-zinc-400">{course.semester}</span>}
         </div>
-        <div className="header-actions">
-          <Link to={`/courses/${id}/grades`} className="btn-secondary">View Grades</Link>
-          <Link to={`/courses/${id}/syllabus`} className="btn-secondary">Import Syllabus</Link>
-          <Link to={`/courses/${id}/import-assignments`} className="btn-secondary">Import Assignments</Link>
+        <div className="flex flex-wrap gap-2">
+          <Link to={`/courses/${id}/grades`} className={btnSecondary}>View Grades</Link>
+          <Link to={`/courses/${id}/syllabus`} className={btnSecondary}>Import Syllabus</Link>
+          <Link to={`/courses/${id}/import-assignments`} className={btnSecondary}>Import Assignments</Link>
         </div>
       </div>
 
       {/* Categories */}
-      <section className="detail-section">
-        <div className="section-header">
-          <h2>Grade Categories <span className="weight-total">({totalWeight.toFixed(0)}% total)</span></h2>
-          <button className="btn-secondary" onClick={() => setShowCatForm(!showCatForm)}>
+      <section className="mb-8">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-display text-base font-semibold">Grade Categories <span className="text-sm font-normal text-zinc-500">({totalWeight.toFixed(0)}% total)</span></h2>
+          <button className={btnSecondary} onClick={() => setShowCatForm(!showCatForm)}>
             {showCatForm ? 'Cancel' : '+ Add Category'}
           </button>
         </div>
 
         {showCatForm && (
-          <form onSubmit={handleCreateCategory} className="inline-form">
-            <input placeholder="Name (e.g. Homework)" value={catForm.name} onChange={(e) => setCatForm({ ...catForm, name: e.target.value })} required />
-            <input type="number" placeholder="Weight %" min="0" max="100" value={catForm.weight_percent} onChange={(e) => setCatForm({ ...catForm, weight_percent: e.target.value })} required />
-            <input type="number" placeholder="Drop count" min="0" value={catForm.drop_count} onChange={(e) => setCatForm({ ...catForm, drop_count: e.target.value })} />
-            <button type="submit" className="btn-primary">Add</button>
+          <form onSubmit={handleCreateCategory} className="mb-4 flex flex-wrap gap-2">
+            <input className={`${inputCls} flex-1`} placeholder="Name (e.g. Homework)" value={catForm.name} onChange={(e) => setCatForm({ ...catForm, name: e.target.value })} required />
+            <input className={`${inputCls} w-28`} type="number" placeholder="Weight %" min="0" max="100" value={catForm.weight_percent} onChange={(e) => setCatForm({ ...catForm, weight_percent: e.target.value })} required />
+            <input className={`${inputCls} w-28`} type="number" placeholder="Drop count" min="0" value={catForm.drop_count} onChange={(e) => setCatForm({ ...catForm, drop_count: e.target.value })} />
+            <button type="submit" className={btnPrimary}>Add</button>
           </form>
         )}
 
-        <div className="categories-list">
+        <div className="flex flex-col">
           {categories.map((cat) => (
-            <div key={cat.id} className="category-row">
-              <div className="category-info">
-                <span className="category-name">{cat.name}</span>
-                <span className="category-meta">{cat.weight_percent}% weight{cat.drop_count > 0 ? ` · drops ${cat.drop_count} lowest` : ''}</span>
+            <div key={cat.id} className="flex items-center justify-between border-b border-white/5 py-3">
+              <div className="flex flex-col">
+                <span className="text-sm font-semibold">{cat.name}</span>
+                <span className="text-xs text-zinc-500">{cat.weight_percent}% weight{cat.drop_count > 0 ? ` · drops ${cat.drop_count} lowest` : ''}</span>
               </div>
-              <button className="btn-danger-sm" onClick={async () => { if (confirm('Delete category and all its assignments?')) { await deleteCategory(cat.id); load() } }}>×</button>
+              <button className="rounded px-2 py-1 text-grade-f transition hover:bg-grade-f/10" onClick={async () => { if (confirm('Delete category and all its assignments?')) { await deleteCategory(cat.id); load() } }}>×</button>
             </div>
           ))}
-          {categories.length === 0 && <p className="empty-msg">No categories yet. Import a syllabus or add manually.</p>}
+          {categories.length === 0 && <p className="py-2 text-sm text-zinc-500">No categories yet. Import a syllabus or add manually.</p>}
         </div>
       </section>
 
       {/* Assignments */}
-      <section className="detail-section">
-        <div className="section-header">
-          <h2>Assignments</h2>
-          <button className="btn-secondary" onClick={() => setShowAssignForm(!showAssignForm)} disabled={categories.length === 0}>
+      <section className="mb-8">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-display text-base font-semibold">Assignments</h2>
+          <button className={btnSecondary} onClick={() => setShowAssignForm(!showAssignForm)} disabled={categories.length === 0}>
             {showAssignForm ? 'Cancel' : '+ Add Assignment'}
           </button>
         </div>
 
         {showAssignForm && (
-          <form onSubmit={handleCreateAssignment} className="card form-card">
-            <div className="form-row">
-              <label>Category *
-                <select value={assignForm.category_id} onChange={(e) => setAssignForm({ ...assignForm, category_id: e.target.value })} required>
+          <form onSubmit={handleCreateAssignment} className={card}>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className={labelCls}>Category *
+                <select className={inputCls} value={assignForm.category_id} onChange={(e) => setAssignForm({ ...assignForm, category_id: e.target.value })} required>
                   <option value="">Select…</option>
                   {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </label>
-              <label>Name *
-                <input value={assignForm.name} onChange={(e) => setAssignForm({ ...assignForm, name: e.target.value })} required placeholder="e.g., HW 1" />
+              <label className={labelCls}>Name *
+                <input className={inputCls} value={assignForm.name} onChange={(e) => setAssignForm({ ...assignForm, name: e.target.value })} required placeholder="e.g., HW 1" />
               </label>
             </div>
-            <div className="form-row">
-              <label>Max Score *
-                <input type="number" value={assignForm.max_score} onChange={(e) => setAssignForm({ ...assignForm, max_score: e.target.value })} required min="0" />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className={labelCls}>Max Score *
+                <input className={inputCls} type="number" value={assignForm.max_score} onChange={(e) => setAssignForm({ ...assignForm, max_score: e.target.value })} required min="0" />
               </label>
-              <label>Earned Score (leave blank if not graded)
-                <input type="number" value={assignForm.earned_score} onChange={(e) => setAssignForm({ ...assignForm, earned_score: e.target.value })} min="0" />
+              <label className={labelCls}>Earned Score (leave blank if not graded)
+                <input className={inputCls} type="number" value={assignForm.earned_score} onChange={(e) => setAssignForm({ ...assignForm, earned_score: e.target.value })} min="0" />
               </label>
             </div>
-            <div className="form-row">
-              <label>Due Date
-                <input type="datetime-local" value={assignForm.due_date} onChange={(e) => setAssignForm({ ...assignForm, due_date: e.target.value })} />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className={labelCls}>Due Date
+                <input className={inputCls} type="datetime-local" value={assignForm.due_date} onChange={(e) => setAssignForm({ ...assignForm, due_date: e.target.value })} />
               </label>
-              <label>Recurrence
-                <select value={assignForm.recurrence_pattern} onChange={(e) => setAssignForm({ ...assignForm, recurrence_pattern: e.target.value, is_recurring: e.target.value !== '' })}>
+              <label className={labelCls}>Recurrence
+                <select className={inputCls} value={assignForm.recurrence_pattern} onChange={(e) => setAssignForm({ ...assignForm, recurrence_pattern: e.target.value, is_recurring: e.target.value !== '' })}>
                   {RECURRENCE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
               </label>
             </div>
-            <label>Notes
-              <input value={assignForm.notes} onChange={(e) => setAssignForm({ ...assignForm, notes: e.target.value })} placeholder="Optional" />
+            <label className={labelCls}>Notes
+              <input className={inputCls} value={assignForm.notes} onChange={(e) => setAssignForm({ ...assignForm, notes: e.target.value })} placeholder="Optional" />
             </label>
-            <button type="submit" className="btn-primary">Add Assignment</button>
+            <button type="submit" className={`${btnPrimary} self-start`}>Add Assignment</button>
           </form>
         )}
 
@@ -197,54 +203,54 @@ export default function CourseDetail() {
           const catAssignments = assignmentsByCategory(cat.id)
           if (catAssignments.length === 0) return null
           return (
-            <div key={cat.id} className="category-assignments">
-              <h3 className="cat-label">{cat.name}</h3>
-              <div className="assignments-table">
-                <div className="assignments-table-header">
+            <div key={cat.id} className="mb-5">
+              <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-400">{cat.name}</h3>
+              <div className="overflow-hidden rounded-xl border border-white/5">
+                <div className="grid grid-cols-[1fr_100px_90px_90px] gap-2 border-b border-white/5 bg-ink-800 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
                   <span>Name</span><span>Score</span><span>Due</span><span></span>
                 </div>
                 {catAssignments.map((a) => (
                   editingId === a.id ? (
-                    <div key={a.id} className="assignment-edit-row">
-                      <div className="edit-row-grid">
-                        <label>Name
-                          <input value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
+                    <div key={a.id} className="border-b border-white/5 bg-ink-800 p-4">
+                      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                        <label className={labelCls}>Name
+                          <input className={inputCls} value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
                         </label>
-                        <label>Earned Score
-                          <input type="number" value={editForm.earned_score} onChange={(e) => setEditForm({ ...editForm, earned_score: e.target.value })} placeholder="blank = ungraded" min="0" />
+                        <label className={labelCls}>Earned Score
+                          <input className={inputCls} type="number" value={editForm.earned_score} onChange={(e) => setEditForm({ ...editForm, earned_score: e.target.value })} placeholder="blank = ungraded" min="0" />
                         </label>
-                        <label>Max Score
-                          <input type="number" value={editForm.max_score} onChange={(e) => setEditForm({ ...editForm, max_score: e.target.value })} min="0" />
+                        <label className={labelCls}>Max Score
+                          <input className={inputCls} type="number" value={editForm.max_score} onChange={(e) => setEditForm({ ...editForm, max_score: e.target.value })} min="0" />
                         </label>
-                        <label>Due Date
-                          <input type="datetime-local" value={editForm.due_date} onChange={(e) => setEditForm({ ...editForm, due_date: e.target.value })} />
+                        <label className={labelCls}>Due Date
+                          <input className={inputCls} type="datetime-local" value={editForm.due_date} onChange={(e) => setEditForm({ ...editForm, due_date: e.target.value })} />
                         </label>
-                        <label>Recurrence
-                          <select value={editForm.recurrence_pattern} onChange={(e) => setEditForm({ ...editForm, recurrence_pattern: e.target.value })}>
+                        <label className={labelCls}>Recurrence
+                          <select className={inputCls} value={editForm.recurrence_pattern} onChange={(e) => setEditForm({ ...editForm, recurrence_pattern: e.target.value })}>
                             {RECURRENCE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                           </select>
                         </label>
-                        <label>Notes
-                          <input value={editForm.notes} onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })} placeholder="Optional" />
+                        <label className={labelCls}>Notes
+                          <input className={inputCls} value={editForm.notes} onChange={(e) => setEditForm({ ...editForm, notes: e.target.value })} placeholder="Optional" />
                         </label>
                       </div>
-                      <div className="edit-row-actions">
-                        <button className="btn-primary" onClick={() => handleSaveEdit(a)}>Save</button>
-                        <button className="btn-secondary" onClick={() => setEditingId(null)}>Cancel</button>
+                      <div className="mt-3 flex gap-2">
+                        <button className={btnPrimary} onClick={() => handleSaveEdit(a)}>Save</button>
+                        <button className={btnSecondary} onClick={() => setEditingId(null)}>Cancel</button>
                       </div>
                     </div>
                   ) : (
-                    <div key={a.id} className="assignment-row">
-                      <span className="asgn-name">{a.name}{a.is_recurring && <span className="recurring-badge">↺</span>}</span>
-                      <span className="asgn-score">
-                        <button className="score-btn" onClick={() => startEdit(a)}>
+                    <div key={a.id} className="grid grid-cols-[1fr_100px_90px_90px] items-center gap-2 border-b border-white/5 px-4 py-2.5 text-sm last:border-0">
+                      <span className="flex items-center gap-1.5 truncate">{a.name}{a.is_recurring && <span className="text-xs text-violet-light" title="Recurring">↺</span>}</span>
+                      <span>
+                        <button className="rounded bg-ink-700 px-2 py-1 text-xs tabular-nums text-zinc-200 transition hover:bg-ink-600" onClick={() => startEdit(a)}>
                           {a.earned_score !== null ? `${a.earned_score}/${a.max_score}` : `—/${a.max_score}`}
                         </button>
                       </span>
-                      <span className="asgn-due">{a.due_date ? new Date(a.due_date).toLocaleDateString() : '—'}</span>
-                      <span className="asgn-actions">
-                        <button className="btn-xs edit-btn" onClick={() => startEdit(a)}>Edit</button>
-                        <button className="btn-danger-sm" onClick={() => handleDeleteAssignment(a.id)}>×</button>
+                      <span className="text-xs tabular-nums text-zinc-500">{a.due_date ? new Date(a.due_date).toLocaleDateString() : '—'}</span>
+                      <span className="flex items-center justify-end gap-1">
+                        <button className="rounded border border-white/10 px-2 py-1 text-xs text-zinc-300 transition hover:border-violet/50 hover:text-white" onClick={() => startEdit(a)}>Edit</button>
+                        <button className="rounded px-2 py-1 text-grade-f transition hover:bg-grade-f/10" onClick={() => handleDeleteAssignment(a.id)}>×</button>
                       </span>
                     </div>
                   )
@@ -253,7 +259,7 @@ export default function CourseDetail() {
             </div>
           )
         })}
-        {assignments.length === 0 && <p className="empty-msg">No assignments yet.</p>}
+        {assignments.length === 0 && <p className="py-2 text-sm text-zinc-500">No assignments yet.</p>}
       </section>
     </div>
   )

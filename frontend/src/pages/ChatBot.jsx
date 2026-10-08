@@ -2,20 +2,27 @@ import { useState, useRef, useEffect } from 'react'
 import { aiChat, aiConfirm } from '../api/ai'
 
 function Message({ msg }) {
+  const isUser = msg.role === 'user'
   return (
-    <div className={`chat-msg ${msg.role}`}>
-      <div className="chat-bubble">{msg.content}</div>
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
+      <div
+        className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm ${
+          isUser ? 'bg-violet text-white' : 'border border-white/5 bg-ink-700 text-zinc-200'
+        }`}
+      >
+        {msg.content}
+      </div>
     </div>
   )
 }
 
 function ConfirmAction({ pending, onConfirm, onDecline }) {
   return (
-    <div className="confirm-action">
-      <p className="confirm-label">Confirm this change?</p>
-      <div className="confirm-buttons">
-        <button className="btn-primary" onClick={onConfirm}>Yes, do it</button>
-        <button className="btn-secondary" onClick={onDecline}>No, cancel</button>
+    <div className="rounded-xl border border-violet/40 bg-violet/10 p-4">
+      <p className="mb-3 text-sm font-medium text-zinc-200">Confirm this change?</p>
+      <div className="flex gap-2">
+        <button className="rounded-lg bg-violet px-4 py-2 text-sm font-medium text-white transition hover:bg-violet-light" onClick={onConfirm}>Yes, do it</button>
+        <button className="rounded-lg border border-white/10 px-3 py-2 text-sm text-zinc-300 transition hover:border-violet/50 hover:text-white" onClick={onDecline}>No, cancel</button>
       </div>
     </div>
   )
@@ -88,34 +95,38 @@ export default function ChatBot() {
   }
 
   return (
-    <div className="chat-page">
-      <div className="chat-header">
-        <h1>AI Assistant</h1>
-        <p className="chat-subtitle">Ask about your grades, assignments, or let me help you add things</p>
+    <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-3xl flex-col px-4 py-6">
+      <div className="mb-4">
+        <h1 className="font-display text-2xl font-semibold tracking-tight">AI Assistant</h1>
+        <p className="mt-1 text-sm text-zinc-400">Ask about your grades, assignments, or let me help you add things</p>
       </div>
 
-      <div className="chat-messages">
+      <div className="flex flex-1 flex-col gap-3 overflow-y-auto pr-1">
         {messages.map((m, i) => <Message key={i} msg={m} />)}
         {pendingAction && (
           <ConfirmAction pending={pendingAction} onConfirm={handleConfirm} onDecline={handleDecline} />
         )}
         {loading && (
-          <div className="chat-msg assistant">
-            <div className="chat-bubble thinking">Thinking…</div>
+          <div className="flex justify-start">
+            <div className="rounded-2xl border border-white/5 bg-ink-700 px-4 py-2.5 text-sm italic text-zinc-500">Thinking…</div>
           </div>
         )}
         <div ref={bottomRef} />
       </div>
 
-      <form className="chat-input-form" onSubmit={handleSend}>
+      <form className="mt-4 flex gap-2" onSubmit={handleSend}>
         <input
-          className="chat-input"
+          className="flex-1 rounded-lg border border-white/10 bg-ink-700 px-3.5 py-2.5 text-zinc-100 focus:border-violet focus:outline-none"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="Ask me anything about your grades…"
           disabled={loading || !!pendingAction}
         />
-        <button type="submit" className="btn-primary" disabled={loading || !!pendingAction || !input.trim()}>
+        <button
+          type="submit"
+          className="rounded-lg bg-violet px-5 py-2.5 font-medium text-white transition hover:bg-violet-light disabled:opacity-50"
+          disabled={loading || !!pendingAction || !input.trim()}
+        >
           Send
         </button>
       </form>

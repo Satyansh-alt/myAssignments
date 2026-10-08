@@ -15,51 +15,65 @@ function occurrenceDateOf(iso) {
   return iso.slice(0, 10)
 }
 
+function hexToRgba(hex, a) {
+  const h = (hex || '#8b5cf6').replace('#', '')
+  const r = parseInt(h.slice(0, 2), 16)
+  const g = parseInt(h.slice(2, 4), 16)
+  const b = parseInt(h.slice(4, 6), 16)
+  return `rgba(${r},${g},${b},${a})`
+}
+
 function AssignmentItem({ item, onToggle }) {
   return (
-    <div className={`assignment-item ${item.is_graded ? 'graded' : ''} ${item.completed ? 'completed' : ''}`}>
-      <div className="assignment-item-left">
-        <input
-          type="checkbox"
-          className="assignment-checkbox"
-          checked={item.completed}
-          onChange={(e) => onToggle(item, e.target.checked)}
-        />
-        <span className="course-dot" style={{ background: item.course_color }} />
-        <div>
-          <div className="assignment-name">{item.name}</div>
-          <div className="assignment-course">{item.course_name}</div>
-        </div>
+    <div className="mb-2 flex items-center gap-3.5 rounded-lg border border-white/5 bg-ink-800 px-4 py-3">
+      <input
+        type="checkbox"
+        className="h-[18px] w-[18px] flex-shrink-0 cursor-pointer accent-violet"
+        checked={item.completed}
+        onChange={(e) => onToggle(item, e.target.checked)}
+      />
+      <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full" style={{ background: item.course_color }} />
+      <div className="min-w-0 flex-1">
+        <div className={`text-sm font-medium ${item.completed ? 'text-zinc-500 line-through' : 'text-zinc-100'}`}>{item.name}</div>
+        <div className="text-xs text-zinc-500">{item.course_name}</div>
       </div>
-      <div className="assignment-item-right">
+      <div className="flex flex-col items-end gap-0.5">
         {item.is_graded
-          ? <span className="score-badge">{item.earned_score}/{item.max_score}</span>
-          : <span className="score-badge pending">/{item.max_score}</span>
+          ? <span className="rounded-full bg-violet/15 px-2.5 py-0.5 text-xs font-semibold tabular-nums text-violet-light">{item.earned_score}/{item.max_score}</span>
+          : <span className="rounded-full bg-ink-600 px-2.5 py-0.5 text-xs font-semibold tabular-nums text-zinc-500">/{item.max_score}</span>
         }
-        <div className="due-time">{formatDate(item.due_date)}</div>
+        <div className="text-xs tabular-nums text-zinc-500">{formatDate(item.due_date)}</div>
       </div>
     </div>
   )
 }
 
 function GradeCard({ course }) {
-  const pct = course.overall_percent
+  const current = course.current_percent
+  const total = course.total_percent
   return (
-    <Link to={`/courses/${course.course_id}/grades`} className="grade-card" style={{ borderLeftColor: course.color }}>
-      <div className="grade-card-name">{course.course_name}</div>
-      <div className="grade-card-semester">{course.semester}</div>
-      <div className="grade-card-grade">
-        {pct !== null ? (
-          <>
-            <span className="grade-pct">{pct.toFixed(1)}%</span>
-            <span className="grade-letter">{course.letter_grade}</span>
-          </>
-        ) : (
-          <span className="grade-none">No grades yet</span>
-        )}
-      </div>
-      {course.weight_graded_so_far < 100 && (
-        <div className="grade-weight-note">{course.weight_graded_so_far}% of grade graded</div>
+    <Link
+      to={`/courses/${course.course_id}/grades`}
+      className="relative block overflow-hidden rounded-xl border border-white/5 p-4 transition hover:border-white/15"
+      style={{ backgroundColor: hexToRgba(course.color, 0.1), borderLeft: `3px solid ${course.color}` }}
+    >
+      <div className="font-display text-base font-semibold">{course.course_name}</div>
+      <div className="mb-4 text-xs text-zinc-400">{course.semester}</div>
+      {current !== null ? (
+        <div className="flex gap-6">
+          <div>
+            <div className="text-[0.62rem] font-semibold uppercase tracking-wider text-zinc-500">Current</div>
+            <div className="mt-0.5 font-display text-2xl font-semibold tabular-nums">{current.toFixed(1)}%</div>
+            <div className="text-sm text-zinc-400">{course.current_letter}</div>
+          </div>
+          <div>
+            <div className="text-[0.62rem] font-semibold uppercase tracking-wider text-zinc-500">Total</div>
+            <div className="mt-0.5 font-display text-2xl font-semibold tabular-nums text-zinc-400">{total !== null ? total.toFixed(1) + '%' : '—'}</div>
+            <div className="text-sm text-zinc-500">{course.total_letter || ''}</div>
+          </div>
+        </div>
+      ) : (
+        <div className="text-sm text-zinc-500">No grades yet</div>
       )}
     </Link>
   )
@@ -115,42 +129,46 @@ export default function Dashboard() {
   if (loading && !dashboard) return <LoadingSpinner />
 
   return (
-    <div className="page">
-      <div className="page-header">
-        <h1>Hi, {user?.full_name?.split(' ')[0]} 👋</h1>
+    <div className="mx-auto max-w-4xl px-4 py-6">
+      <div className="mb-6">
+        <h1 className="font-display text-2xl font-semibold tracking-tight">Hi, {user?.full_name?.split(' ')[0]} 👋</h1>
       </div>
 
-      <section className="dashboard-section">
-        <h2>Due Today</h2>
+      <section className="mb-8">
+        <h2 className="mb-3 font-display text-base font-semibold">Due Today</h2>
         {dashboard?.today?.length === 0
-          ? <p className="empty-msg">Nothing due today.</p>
+          ? <p className="py-2 text-sm text-zinc-500">Nothing due today.</p>
           : dashboard?.today?.map((item) => <AssignmentItem key={`${item.assignment_id}-${item.due_date}`} item={item} onToggle={toggleCompletion} />)
         }
       </section>
 
-      <section className="dashboard-section">
-        <div className="section-header">
-          <h2>Upcoming</h2>
-          <select className="range-select" value={range} onChange={(e) => setRange(Number(e.target.value))}>
+      <section className="mb-8">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-display text-base font-semibold">Upcoming</h2>
+          <select
+            className="rounded-lg border border-white/10 bg-ink-700 px-2.5 py-1.5 text-sm text-zinc-200 focus:border-violet focus:outline-none"
+            value={range}
+            onChange={(e) => setRange(Number(e.target.value))}
+          >
             {RANGE_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
         </div>
         {dashboard?.upcoming?.length === 0
-          ? <p className="empty-msg">No upcoming assignments.</p>
+          ? <p className="py-2 text-sm text-zinc-500">No upcoming assignments.</p>
           : dashboard?.upcoming?.map((item) => <AssignmentItem key={`${item.assignment_id}-${item.due_date}`} item={item} onToggle={toggleCompletion} />)
         }
       </section>
 
-      <section className="dashboard-section">
-        <div className="section-header">
-          <h2>Current Grades</h2>
-          <Link to="/courses" className="btn-secondary">Manage Courses</Link>
+      <section className="mb-8">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-display text-base font-semibold">Current Grades</h2>
+          <Link to="/courses" className="rounded-lg border border-white/10 px-3 py-1.5 text-sm text-zinc-300 transition hover:border-violet/50 hover:text-white">Manage Courses</Link>
         </div>
         {grades.length === 0
-          ? <p className="empty-msg">No courses yet. <Link to="/courses">Add a course</Link></p>
-          : <div className="grade-cards">{grades.map((c) => <GradeCard key={c.course_id} course={c} />)}</div>
+          ? <p className="py-2 text-sm text-zinc-500">No courses yet. <Link to="/courses" className="text-violet-light hover:underline">Add a course</Link></p>
+          : <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">{grades.map((c) => <GradeCard key={c.course_id} course={c} />)}</div>
         }
       </section>
     </div>

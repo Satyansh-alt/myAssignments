@@ -32,7 +32,7 @@ export default function App() {
   return (
     <BrowserRouter>
       {user && <Navbar />}
-      <main className="main-content">
+      <main className={user ? 'min-h-screen bg-ink pt-16' : 'min-h-screen bg-ink'}>
         <Routes>
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
