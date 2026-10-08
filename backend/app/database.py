@@ -6,7 +6,7 @@ settings = get_settings()
 
 connect_args = {"check_same_thread": False} if settings.is_sqlite else {}
 
-engine = create_engine(settings.DATABASE_URL, connect_args=connect_args)
+engine = create_engine(settings.sqlalchemy_url, connect_args=connect_args)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 

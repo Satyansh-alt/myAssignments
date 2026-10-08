@@ -11,12 +11,12 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-db_url = os.environ.get("DATABASE_URL", "sqlite:///./dev.db")
-config.set_main_option("sqlalchemy.url", db_url)
-
-# Import all models so Alembic can detect them
+# Import settings/models so Alembic uses the same normalized DB URL as the app
+from app.config import get_settings  # noqa
 from app.database import Base  # noqa
 import app.models  # noqa
+
+config.set_main_option("sqlalchemy.url", get_settings().sqlalchemy_url)
 
 target_metadata = Base.metadata
 

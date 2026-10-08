@@ -15,6 +15,21 @@ class Settings(BaseSettings):
         return self.DATABASE_URL.startswith("sqlite")
 
     @property
+    def sqlalchemy_url(self) -> str:
+        """Normalize the DB URL so SQLAlchemy uses the psycopg (v3) driver.
+
+        Railway hands us a bare ``postgresql://`` (and legacy ``postgres://``)
+        URL. SQLAlchemy 2.0's default dbapi for that scheme is ambiguous
+        across environments, so we pin it to psycopg v3 explicitly.
+        """
+        url = self.DATABASE_URL
+        if url.startswith("postgres://"):
+            url = "postgresql://" + url[len("postgres://"):]
+        if url.startswith("postgresql://"):
+            url = "postgresql+psycopg://" + url[len("postgresql://"):]
+        return url
+
+    @property
     def origins_list(self) -> list[str]:
         return [o.strip() for o in self.ALLOWED_ORIGINS.split(",")]
 
