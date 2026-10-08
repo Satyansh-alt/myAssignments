@@ -12,7 +12,11 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     payload = decode_token(token)
     if payload is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
-    user = db.query(User).filter(User.id == payload.get("sub")).first()
+    try:
+        user_id = int(payload.get("sub"))
+    except (TypeError, ValueError):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token subject")
+    user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return user
